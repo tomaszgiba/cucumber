@@ -4,24 +4,33 @@ import Immutable from "immutable"
 const EMPTY_LIST = new Immutable.List()
 const EMPTY_MAP = new Immutable.Map()
 
-const Cucumber = ({sources}) =>
-  <div>
+const Cucumber = ({state}) => {
+  const sources = state.get('sources')
+  const testCases = state.get('testCases')
+  return <div>
     <h1>Cucumber HTML</h1>
-    {Array.from(sources.keys()).map(uri => <GherkinDocument node={sources.get(uri)} uri={uri} key={uri}/>)}
+    {Array.from(sources.keys()).map(uri => <GherkinDocument node={sources.get(uri)} uri={uri} key={uri} testCases={testCases}/>)}
   </div>
-
-Cucumber.propTypes = {
-  sources: React.PropTypes.instanceOf(Immutable.Map).isRequired
 }
 
-const GherkinDocument = ({node, uri}) =>
+Cucumber.propTypes = {
+  state: React.PropTypes.instanceOf(Immutable.Map).isRequired
+}
+
+const GherkinDocument = ({node, uri, testCases}) =>
   <div>
     <Feature node={node.get('feature')} uri={uri} attachmentsByLine={node.get('attachments', EMPTY_MAP)}/>
+    <div className="test-case-count">{ testCases.size }</div>
   </div>
 
 GherkinDocument.propTypes = {
   node: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-  uri: React.PropTypes.string.isRequired
+  uri: React.PropTypes.string.isRequired,
+  testCases: React.PropTypes.instanceOf(Immutable.List).isRequired
+}
+
+GherkinDocument.defaultProps = {
+  testCases: EMPTY_LIST
 }
 
 const Feature = ({node, uri, attachmentsByLine}) =>

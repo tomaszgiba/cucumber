@@ -3,6 +3,8 @@ import {Map, OrderedMap, List, fromJS} from "immutable"
 
 const parser = new Gherkin.Parser()
 
+const lookupNode = () => "[some gherkin ast node]"
+
 const reducer = (state, action) => {
   if (!state) return new Map({sources: new Map()})
 
@@ -22,6 +24,22 @@ const reducer = (state, action) => {
           media: action.media
         }))
       })
+    }
+    case 'test-cases': {
+      const testCases = action.testCases.map((testCase) => ({
+        uri: testCase.uri,
+        line: testCase.line,
+        status: 'idle',
+        result: 'unknown',
+        testSteps: testCase.testSteps.map((testStep) => ({
+          uri: testStep.uri,
+          line: testStep.line,
+          status: 'idle',
+          result: 'unknown',
+        }))
+      }))
+      state = state.set('testCases', fromJS(testCases))
+      return state
     }
     default: {
       throw new Error("Unsupported action: " + JSON.stringify(action))

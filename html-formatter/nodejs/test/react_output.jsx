@@ -15,7 +15,7 @@ class ReactOutput extends Stream.Writable {
   }
 
   getFeatureNames() {
-    const cucumber = render(<Cucumber sources={this._state.get('sources')}/>)
+    const cucumber = render(<Cucumber state={this._state}/>)
     return Promise.resolve(cucumber.find('.feature > .name').text())
   }
 }

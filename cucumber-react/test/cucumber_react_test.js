@@ -60,6 +60,32 @@ describe('Cucumber React', () => {
       const component = shallow(<GherkinDocument node={node} uri={uri}/>)
       assert.equal(component.find(Feature).length, 1)
     })
+
+    it("renders the number of test cases", () => {
+      const uri = 'features/hello.feature'
+      const events = [{
+        type: "test-cases",
+        timestamp: 1471420027079,
+        series: "df1d3970-644e-11e6-8b77-86f30ca893d3",
+        testCases: [
+          {
+            uri,
+            line: 2,
+            testSteps: [
+              {
+                uri,
+                line: 3
+              }
+            ]
+          }
+        ]
+      }]
+      const newState = events.reduce(reducer, state)
+      const node = newState.getIn(['sources', uri])
+      const testCases = newState.get('testCases')
+      const component = shallow(<GherkinDocument node={node} uri={uri} testCases={testCases}/>)
+      assert.equal(component.find('.test-case-count').text(), "1")
+    })
   })
 
   describe(Feature.name, () => {

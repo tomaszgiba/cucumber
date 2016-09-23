@@ -74,4 +74,59 @@ describe(reducer.name, () => {
       { uri: 'build/screenshots/world.png', data: undefined, media: undefined }
     ])
   })
+
+  it("stores test cases in the state", () => {
+    const events = [
+      {
+        type: "start",
+        timestamp: 1471614838649,
+        series: "df1d3970-644e-11e6-8b77-86f30ca893d3"
+      },
+      {
+        type: "source",
+        timestamp: 1471614838650,
+        series: "df1d3970-644e-11e6-8b77-86f30ca893d3",
+        uri: "features/hello.feature",
+        data: `Feature: test feature
+  Scenario: test Scenario
+    Given passing`
+      },
+      {
+        type: "test-cases",
+        timestamp: 1471614838651,
+        series: "df1d3970-644e-11e6-8b77-86f30ca893d3",
+        testCases: [
+          {
+            uri: "features/hello.feature",
+            line: 2,
+            testSteps: [
+              {
+                uri: "features/hello.feature",
+                line: 3
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
+    const state = events.reduce(reducer, reducer())
+
+    assert.deepEqual(state.get('testCases').toJS(), [
+      {
+        uri: "features/hello.feature",
+        line: 2,
+        status: 'idle',
+        result: 'unknown',
+        testSteps: [
+          {
+            uri: "features/hello.feature",
+            line: 3,
+            status: 'idle',
+            result: 'unknown'
+          }
+        ]
+      }
+    ])
+  })
 })
