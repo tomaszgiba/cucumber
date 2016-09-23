@@ -1,4 +1,2 @@
-import * as CucumberReact from './cucumber_react'
-import reducer from './reducer'
-
-export { CucumberReact, reducer }
+export {Cucumber, GherkinDocument, Feature, Scenario, Step, Attachment} from './cucumber_react'
+export {default as reducer} from './reducer'

@@ -1,8 +1,7 @@
 import Stream from "stream"
 import React from "react"
 import ReactDOMServer from "react-dom/server"
-import {CucumberReact} from "cucumber-react"
-const {Cucumber} = CucumberReact
+import {Cucumber} from "cucumber-react"
 
 class HtmlStream extends Stream.Transform {
   constructor() {

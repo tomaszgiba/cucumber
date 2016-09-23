@@ -1,8 +1,7 @@
 import Stream from "stream"
 import React from "react"
 import {render} from "enzyme"
-import {CucumberReact} from "cucumber-react"
-const {Cucumber} = CucumberReact
+import {Cucumber} from "cucumber-react"
 
 class ReactOutput extends Stream.Writable {
   constructor() {
