@@ -3,7 +3,7 @@ import assert from "assert"
 import React from "react"
 import {shallow} from "enzyme"
 import {CucumberReact, reducer} from "../lib"
-const {GherkinDocument, Feature, Scenario, Step, Attachment} = CucumberReact
+const {Cucumber, ProgressBar, GherkinDocument, Feature, Scenario, Step, Attachment} = CucumberReact
 
 const events = [
   {"type": "start", "timestamp": 1471614838649, "series": "df1d3970-644e-11e6-8b77-86f30ca893d3"},
@@ -53,15 +53,15 @@ const events = [
 const state = events.reduce(reducer, reducer())
 
 describe('Cucumber React', () => {
-  describe(GherkinDocument.name, () => {
-    it("renders the feature", () => {
-      const uri = 'features/hello.feature'
-      const node = state.getIn(['sources', uri])
-      const component = shallow(<GherkinDocument node={node} uri={uri}/>)
-      assert.equal(component.find(Feature).length, 1)
+  describe(Cucumber.name, () => {
+    it("renders a ProgressBar", () => {
+      const component = shallow(<Cucumber state={state}/>)
+      assert.equal(component.find(ProgressBar).length, 1)
     })
+  })
 
-    it("renders the number of test cases", () => {
+  describe(ProgressBar.name, () => {
+    it("renders the total number of test cases", () => {
       const uri = 'features/hello.feature'
       const events = [{
         type: "test-cases",
@@ -80,12 +80,21 @@ describe('Cucumber React', () => {
           }
         ]
       }]
-      const newState = events.reduce(reducer, state)
-      const node = newState.getIn(['sources', uri])
-      const testCases = newState.get('testCases')
-      const component = shallow(<GherkinDocument node={node} uri={uri} testCases={testCases}/>)
-      assert.equal(component.find('.test-case-count').text(), "1")
+      const testCases = events.reduce(reducer, state)
+        .get('testCases')
+      const component = shallow(<ProgressBar testCases={testCases}/>)
+      assert.equal(component.find('.total-test-cases').text(), "1")
     })
+  })
+
+  describe(GherkinDocument.name, () => {
+    it("renders the feature", () => {
+      const uri = 'features/hello.feature'
+      const node = state.getIn(['sources', uri])
+      const component = shallow(<GherkinDocument node={node} uri={uri}/>)
+      assert.equal(component.find(Feature).length, 1)
+    })
+
   })
 
   describe(Feature.name, () => {

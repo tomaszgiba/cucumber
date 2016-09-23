@@ -3,8 +3,6 @@ import {Map, OrderedMap, List, fromJS} from "immutable"
 
 const parser = new Gherkin.Parser()
 
-const lookupNode = () => "[some gherkin ast node]"
-
 const reducer = (state, action) => {
   if (!state) return new Map({sources: new Map()})
 

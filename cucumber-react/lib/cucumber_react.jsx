@@ -9,7 +9,8 @@ const Cucumber = ({state}) => {
   const testCases = state.get('testCases')
   return <div>
     <h1>Cucumber HTML</h1>
-    {Array.from(sources.keys()).map(uri => <GherkinDocument node={sources.get(uri)} uri={uri} key={uri} testCases={testCases}/>)}
+    <ProgressBar testCases={testCases}/>
+    {Array.from(sources.keys()).map(uri => <GherkinDocument node={sources.get(uri)} uri={uri} key={uri}/>)}
   </div>
 }
 
@@ -17,20 +18,25 @@ Cucumber.propTypes = {
   state: React.PropTypes.instanceOf(Immutable.Map).isRequired
 }
 
-const GherkinDocument = ({node, uri, testCases}) =>
+const ProgressBar = ({testCases}) =>
+  <div className="total-test-cases">{ testCases.size }</div>
+
+ProgressBar.propTypes = {
+  testCases: React.PropTypes.instanceOf(Immutable.List).isRequired
+}
+
+ProgressBar.defaultProps = {
+  testCases: EMPTY_LIST
+}
+
+const GherkinDocument = ({node, uri}) =>
   <div>
     <Feature node={node.get('feature')} uri={uri} attachmentsByLine={node.get('attachments', EMPTY_MAP)}/>
-    <div className="test-case-count">{ testCases.size }</div>
   </div>
 
 GherkinDocument.propTypes = {
   node: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-  uri: React.PropTypes.string.isRequired,
-  testCases: React.PropTypes.instanceOf(Immutable.List).isRequired
-}
-
-GherkinDocument.defaultProps = {
-  testCases: EMPTY_LIST
+  uri: React.PropTypes.string.isRequired
 }
 
 const Feature = ({node, uri, attachmentsByLine}) =>
@@ -115,4 +121,4 @@ Attachment.propTypes = {
   attachment: React.PropTypes.instanceOf(Immutable.Map).isRequired
 }
 
-export {Cucumber, GherkinDocument, Feature, Scenario, Step, Attachment}
+export {Cucumber, ProgressBar, GherkinDocument, Feature, Scenario, Step, Attachment}
