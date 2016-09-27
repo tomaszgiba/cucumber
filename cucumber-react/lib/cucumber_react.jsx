@@ -46,7 +46,7 @@ Feature.propTypes = {
 const Scenario = ({node, uri, attachmentsByLine}) =>
   <div>
     <h3 className="scenario"><span>{node.get('keyword')}: </span><span className="name">{node.get('name')}</span></h3>
-    <ol>
+    <ol className="cucumber-steps">
       {Array.from(node.get('steps')).map(step => {
         const line = step.getIn(['location', 'line'])
         const key = `${uri}:${line}`
