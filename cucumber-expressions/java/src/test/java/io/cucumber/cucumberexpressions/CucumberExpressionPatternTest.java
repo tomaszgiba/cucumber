@@ -70,7 +70,15 @@ public class CucumberExpressionPatternTest {
                 "^I have many big(?:ish)? cukes$",
                 Collections.<Type>emptyList()
         );
+    }
 
+    @Test
+    public void translates_slash_to_non_capturing_alternation() {
+        assertPattern(
+                "I have many big/small/medium cukes",
+                "^I have many (?:big|small|medium) cukes$",
+                Collections.<Type>emptyList()
+        );
     }
 
     private void assertPattern(String expr, String expectedRegexp, List<Type> types) {

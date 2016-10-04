@@ -6,6 +6,7 @@ module Cucumber
     class CucumberExpression
       PARAMETER_PATTERN = /\{([^}:]+)(:([^}]+))?}/
       OPTIONAL_PATTERN = /\(([^\)]+)\)/
+      ALTERNATIVE_WORD_PATTERN = /([\w]+)((\/[\w]+)+)/
 
       attr_reader :source
 
@@ -19,6 +20,9 @@ module Cucumber
 
         # Create non-capturing, optional capture groups from parenthesis
         expression = expression.gsub(OPTIONAL_PATTERN, '(?:\1)?')
+        expression = expression.gsub(ALTERNATIVE_WORD_PATTERN) do |_|
+          "(?:#{$1}#{$2.tr('/', '|')})"
+        end
 
         loop do
           match = PARAMETER_PATTERN.match(expression, match_offset)

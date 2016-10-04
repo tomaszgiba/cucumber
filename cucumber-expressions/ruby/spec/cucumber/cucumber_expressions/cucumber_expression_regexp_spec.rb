@@ -37,6 +37,13 @@ module Cucumber
             /^I have many big(?:ish)? cukes$/
           )
         end
+
+        it "translates slash to non capturing alternation" do
+          assert_regexp(
+            "I have many big/small/medium cukes",
+            /^I have many (?:big|small|medium) cukes$/
+          )
+        end
       end
     end
   end

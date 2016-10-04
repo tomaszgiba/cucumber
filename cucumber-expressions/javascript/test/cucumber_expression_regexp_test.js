@@ -31,6 +31,13 @@ describe(CucumberExpression.name, () => {
         /^I have many big(?:ish)? cukes$/
       )
     })
+
+    it("translates / to non capturing alternation", () => {
+      assertRegexp(
+        "I have many big/small/medium cukes",
+        /^I have many (?:big|small|medium) cukes$/
+      )
+    })
   })
 })
 
