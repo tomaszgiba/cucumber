@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+var GherkinLint
+if(process.env.GHERKIN_LINT_DEV) {
+  require('babel-core/register')
+  GherkinLint = require('../src').default
+} else {
+  GherkinLint = require('../dist').default
+}
+var gherkinLint = new GherkinLint()
+gherkinLint.main()
+  // .then(() => console.log("DONE"))
+  // .catch(err => console.error(err))

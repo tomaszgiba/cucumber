@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import assert from 'assert'
-import ImplementationDetail from '../../lib/rules/implementation_detail'
+import ImplementationDetail from '../../src/rules/implementation_detail'
 import Gherkin from "gherkin"
 
 describe(ImplementationDetail.name, () => {

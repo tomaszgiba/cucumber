@@ -2,13 +2,16 @@
   "name": "gherkin-lint",
   "version": "1.0.0",
   "description": "Linter for Gherkin documents",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "engines": {
     "node": ">=6.5.0"
   },
   "scripts": {
     "test": "npm run eslint && npm run mocha && npm run test-cucumber",
-    "eslint": "eslint lib test",
+    "eslint": "eslint src test",
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build",
+    "postinstall": "node scripts/postinstall.js",
     "mocha": "mocha",
     "test-cucumber": "cucumberjs"
   },

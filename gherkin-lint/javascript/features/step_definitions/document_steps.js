@@ -1,4 +1,4 @@
-import GherkinLint from "../../lib"
+import GherkinLint from "../../src"
 
 module.exports = function () {
   this.Given(/^a Gherkin document at (.*) with contents:$/, function (path, source) {
