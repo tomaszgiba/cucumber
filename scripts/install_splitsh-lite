@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Installs splitsh-lite - a tool that splits a monorepo (this repo)
+# into multiple manyrepos
+#
+set -euf -o pipefail
+
+# Copied from https://github.com/splitsh/lite#installation
+go get -d github.com/libgit2/git2go
+cd $GOPATH/src/github.com/libgit2/git2go
+git checkout next
+git submodule update --init
+make install
+
+go get github.com/splitsh/lite
+go build -o splitsh-lite github.com/splitsh/lite

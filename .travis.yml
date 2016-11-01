@@ -1,0 +1,6 @@
+language: go
+
+install:
+  - ./scripts/install_splitsh-lite
+
+script: ./scripts/push_subtrees
