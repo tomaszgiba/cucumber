@@ -11,6 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo -e "${RED}PATH: ${PATH}${NC}"
+echo -e "${GREEN}bin: $(ls -al bin)${NC}"
 echo -e "${RED}splitsh-lite: $(which splitsh-lite)${NC}"
 
 travis_ymls | while read travis_yml; do
