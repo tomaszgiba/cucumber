@@ -2,5 +2,6 @@ language: go
 
 install:
   - ./scripts/install_splitsh-lite
+  - git fetch --unshallow
 
 script: PATH=${PATH}:./bin ./scripts/push_subtrees
