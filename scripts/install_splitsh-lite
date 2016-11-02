@@ -13,4 +13,5 @@ git submodule update --init
 make install
 
 go get github.com/splitsh/lite
-go build -o scripts/splitsh-lite github.com/splitsh/lite
+mkdir -p bin
+go build -o bin/splitsh-lite github.com/splitsh/lite

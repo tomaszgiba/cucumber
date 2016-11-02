@@ -18,10 +18,12 @@ travis_ymls | while read travis_yml; do
     exit 1
   fi
   manyrepo_url=git@github.com:${manyrepo}.git
-  branch_name=$(git rev-parse --abbrev-ref HEAD)
+  branch_name=${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
   echo -e "${GREEN}pushing manyrepo ${manyrepo} branch ${branch_name}${NC}"
 
   manyrepo_dir_relative_from_root=$(dirname ${travis_yml} | sed -e "s|^$(root_dir)/||")
+  echo -e "dir: ${GREEN}${manyrepo_dir_relative_from_root}${NC}"
   ref=$(splitsh-lite --path "$(root_dir)" --prefix "${manyrepo_dir_relative_from_root}" 2> /dev/null)
+  echo -e "ref: ${GREEN}${ref}${NC}"
   git push "${manyrepo_url}" "${ref}:${branch_name}" --force
 done
