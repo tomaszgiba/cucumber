@@ -23,4 +23,4 @@ go get github.com/splitsh/lite
 mkdir -p bin
 go build -o bin/splitsh-lite github.com/splitsh/lite
 echo -e "${GREEN}Done installing splitsh-lite${NC}"
-echo -e "${GREEN}$(ls -al bin)${NC}"
+bin/splitsh-lite || echo "Does that look ok?"
