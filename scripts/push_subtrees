@@ -10,6 +10,9 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+echo -e "${RED}PATH: ${PATH}${NC}"
+echo -e "${RED}splitsh-lite: $(which splitsh-lite)${NC}"
+
 travis_ymls | while read travis_yml; do
   manyrepo=$(awk '/^#[ \t]+manyrepo:/ {print $3}' ${travis_yml})
   if [ "${manyrepo}" = "" ]
