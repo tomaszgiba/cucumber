@@ -3,4 +3,4 @@ language: go
 install:
   - ./scripts/install_splitsh-lite
 
-script: ./scripts/push_subtrees
+script: PATH=${PATH}:./scripts push_subtrees
