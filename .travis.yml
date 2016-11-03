@@ -6,6 +6,7 @@ script: PATH=${PATH}:./bin ./scripts/push_manyrepos
 before_install:
 - openssl aes-256-cbc -K $encrypted_7fee10189ef4_key -iv $encrypted_7fee10189ef4_iv
   -in cucumber_manyrepo_id_rsa.enc -out cucumber_manyrepo_id_rsa -d
+- chmod 600 cucumber_manyrepo_id_rsa
 - eval `ssh-agent -s`
 - ssh-add cucumber_manyrepo_id_rsa
 env:
