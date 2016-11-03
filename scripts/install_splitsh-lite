@@ -23,5 +23,3 @@ echo -e "${GREEN}Installing splitsh-lite${NC}"
 go get github.com/splitsh/lite
 mkdir -p bin
 go build -o bin/splitsh-lite github.com/splitsh/lite
-echo -e "${GREEN}Done installing splitsh-lite${NC}"
-bin/splitsh-lite || echo "Does that look ok?"

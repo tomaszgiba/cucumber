@@ -10,10 +10,6 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${RED}PATH: ${PATH}${NC}"
-echo -e "${GREEN}bin: $(ls -al bin)${NC}"
-echo -e "${RED}splitsh-lite: $(which splitsh-lite)${NC}"
-
 travis_ymls | while read travis_yml; do
   manyrepo=$(awk '/^#[ \t]+manyrepo:/ {print $3}' ${travis_yml})
   if [ "${manyrepo}" = "" ]
@@ -26,8 +22,6 @@ travis_ymls | while read travis_yml; do
   echo -e "${GREEN}pushing manyrepo ${manyrepo} branch ${branch_name}${NC}"
 
   manyrepo_dir_relative_from_root=$(dirname ${travis_yml} | sed -e "s|^$(root_dir)/||")
-  echo -e "dir: ${GREEN}${manyrepo_dir_relative_from_root}${NC}"
   ref=$(splitsh-lite --path "$(root_dir)" --prefix "${manyrepo_dir_relative_from_root}")
-  echo -e "ref: ${GREEN}${ref}${NC}"
   git push "${manyrepo_url}" "${ref}:${branch_name}" --force
 done
