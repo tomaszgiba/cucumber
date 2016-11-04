@@ -17,7 +17,7 @@ travis_ymls | while read travis_yml; do
     echo -e "${RED}No manyrepo comment in ${travis_yml}${NC}"
     exit 1
   fi
-  manyrepo_url=https://github.com:${manyrepo}.git
+  manyrepo_url=https://github.com/${manyrepo}.git
   branch_name=${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
   echo -e "${GREEN}pushing manyrepo ${manyrepo} branch ${branch_name}${NC}"
 
