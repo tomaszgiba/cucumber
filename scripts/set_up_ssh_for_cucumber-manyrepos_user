@@ -15,10 +15,10 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo -e "${GREEN}Generating keypair...${NC}"
-#ssh-keygen -t rsa -N '' -b 4096 -C "cucumber-manyrepo@cucumber.io" -f cucumber_manyrepo_id_rsa
+ssh-keygen -t rsa -N '' -b 4096 -C "cucumber-manyrepo@cucumber.io" -f cucumber_manyrepo_id_rsa
 
 echo -e "${GREEN}Encrypting private key for Travis...${NC}"
-#travis encrypt-file cucumber_manyrepo_id_rsa --add
+travis encrypt-file cucumber_manyrepo_id_rsa --add
 
 key=$(cat cucumber_manyrepo_id_rsa.pub)
 key_spec=$(
@@ -29,6 +29,7 @@ key_spec=$(
 
 echo -e "${GREEN}Uploading public key to cucumber-manyrepo's GitHub account...${NC}"
 echo -e "${GREEN}${key_spec}${NC}"
+# This fails for some reason. A workaround is to upload the key via the web page.
 curl --user "${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN}" \
   --header "Content-Type: application/json" \
   --request POST \
