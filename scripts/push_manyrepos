@@ -23,5 +23,6 @@ travis_ymls | while read travis_yml; do
 
   manyrepo_dir_relative_from_root=$(dirname ${travis_yml} | sed -e "s|^$(root_dir)/||")
   ref=$(splitsh-lite --path "$(root_dir)" --prefix "${manyrepo_dir_relative_from_root}")
-  git push "${manyrepo_url}" "${ref}:${branch_name}" --force
+
+  git push "${manyrepo_url}" "${ref}:${branch_name}" --force || echo -e "${RED}Push to branch ${branch_name} failed - ignoring${NC}"
 done
