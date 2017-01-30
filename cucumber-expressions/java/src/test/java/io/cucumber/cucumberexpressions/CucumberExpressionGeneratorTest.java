@@ -53,6 +53,13 @@ public class CucumberExpressionGeneratorTest {
     }
 
     @Test
+    public void escapes_parenthesis() {
+        assertUntypedExpression(
+                "I have {arg1} cucumber \\{\\(\\:\\:\\)\\} sandwiches",
+                "I have 42 cucumber {(::)} sandwiches");
+    }
+
+    @Test
     public void generates_expression_for_custom_type() {
         transformLookup.addTransform(new SimpleTransform<>(
                 "currency",

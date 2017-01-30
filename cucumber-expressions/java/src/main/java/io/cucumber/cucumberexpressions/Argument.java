@@ -22,4 +22,24 @@ public class Argument {
     public Object getTransformedValue() {
         return transformedValue;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Argument argument = (Argument) o;
+
+        if (offset != argument.offset) return false;
+        if (!value.equals(argument.value)) return false;
+        return transformedValue.equals(argument.transformedValue);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = offset;
+        result = 31 * result + value.hashCode();
+        result = 31 * result + transformedValue.hashCode();
+        return result;
+    }
 }

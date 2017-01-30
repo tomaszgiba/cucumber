@@ -1,74 +1,27 @@
 package io.cucumber.cucumberexpressions;
 
+import io.cucumber.cucumberexpressions.parser.Cukexp;
+import io.cucumber.cucumberexpressions.parser.Fragment;
+import io.cucumber.cucumberexpressions.parser.Lexer;
+import io.cucumber.cucumberexpressions.parser.Parser;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CucumberExpression implements Expression {
-    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{([^\\}:]+)(:([^\\}]+))?\\}");
-    private static final Pattern OPTIONAL_PATTERN = Pattern.compile("\\(([^\\)]+)\\)");
-
     private final Pattern pattern;
-    private final List<Transform<?>> transforms = new ArrayList<>();
+    private final List<Transform<?>> transforms;
     private final String expression;
 
-    public CucumberExpression(final String expression, List<? extends Type> types, TransformLookup transformLookup) {
+    public CucumberExpression(final String expression, final List<? extends Type> types, final TransformLookup transformLookup) {
+        Parser parser = new Parser(new Lexer(expression));
+        Cukexp cukexp = parser.parse();
+        Fragment fragment = cukexp.compile(new ArrayList<Type>(types), transformLookup);
+        this.pattern = Pattern.compile(fragment.getText());
+        this.transforms = fragment.getTransforms();
         this.expression = expression;
-        String expressionWithOptionalGroups = OPTIONAL_PATTERN.matcher(expression).replaceAll("(?:$1)?");
-        Matcher matcher = PARAMETER_PATTERN.matcher(expressionWithOptionalGroups);
-
-        StringBuffer regexp = new StringBuffer();
-        regexp.append("^");
-        int typeIndex = 0;
-        while (matcher.find()) {
-            Type type = types.size() <= typeIndex ? null : types.get(typeIndex++);
-            String parameterName = matcher.group(1);
-            String typeName = matcher.group(3);
-
-            Transform<?> transform = null;
-            if (type != null) {
-                transform = transformLookup.lookupByType(type);
-            }
-            if (transform == null && typeName != null) {
-                transform = transformLookup.lookupByTypeName(typeName, false);
-            }
-            if (transform == null) {
-                transform = transformLookup.lookupByTypeName(parameterName, true);
-            }
-            if (transform == null && type != null && type instanceof Class) {
-                transform = new ClassTransform<>((Class) type);
-            }
-            if (transform == null) {
-                transform = new ConstructorTransform<>(String.class);
-            }
-            transforms.add(transform);
-
-            matcher.appendReplacement(regexp, Matcher.quoteReplacement(getCaptureGroupRegexp(transform.getCaptureGroupRegexps())));
-        }
-        matcher.appendTail(regexp);
-        regexp.append("$");
-
-        pattern = Pattern.compile(regexp.toString());
-    }
-
-    private String getCaptureGroupRegexp(List<String> captureGroupRegexps) {
-        StringBuilder sb = new StringBuilder("(");
-
-        if(captureGroupRegexps.size() == 1) {
-            sb.append(captureGroupRegexps.get(0));
-        } else {
-            boolean bar = false;
-            for (String captureGroupRegexp : captureGroupRegexps) {
-                if(bar) sb.append("|");
-                sb.append("(?:").append(captureGroupRegexp).append(")");
-                bar = true;
-            }
-        }
-
-        sb.append(")");
-        return sb.toString();
     }
 
     @Override

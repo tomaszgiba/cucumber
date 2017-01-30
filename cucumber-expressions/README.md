@@ -250,6 +250,31 @@ registered [transforms](#custom-type-transforms).
 
 The `Cucumber Expressions` library has 100% test coverage for all implementations.
 
+### Grammar
+
+[EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form) grammar for Cucumber Expressions:
+
+TOKENS: spaces, {}()|, others
+
+```
+CucumberExpression   ::= Expression+
+Expression           ::= Whitespace | Word | Parameter | OptionalText
++ Whitespace           ::= #x9 | #xA | #xD | #x20
++ Word                 ::= AllChars - Whitespace - Lcurly - Rcurly - Lparen - Rparen - Colon
++ Parameter            ::= TypedParameter | UntypedParameter
+AllChars             ::= ? all visible characters ? ;
+Text                   ::= ( Word | Whitespace )+
++ UntypedParameter     ::= "{" Word "}"
++ TypedParameter       ::= "{" Word ":" Word "}"
+OptionalText         ::= "(" Text ")"
+AlternateText        ::= Word "/" ( Word | AlternateText )
++ Lcurly               ::= "{"
++ Rcurly               ::= "}"
++ Lparen               ::= "("
++ Rparen               ::= ")"
++ Colon                ::= ":"
+```
+
 ## Acknowledgements
 
 The Cucumber Expression syntax is inspired by similar expression syntaxes in

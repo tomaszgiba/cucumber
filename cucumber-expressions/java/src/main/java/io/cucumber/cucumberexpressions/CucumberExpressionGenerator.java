@@ -40,7 +40,7 @@ public class CucumberExpressionGenerator {
                 transforms.add(bestTransformMatcher.getTransform());
 
                 expression
-                        .append(text.substring(pos, bestTransformMatcher.start()))
+                        .append(escape(text.substring(pos, bestTransformMatcher.start())))
                         .append("{")
                         .append(argumentName);
                 if (typed) {
@@ -58,8 +58,12 @@ public class CucumberExpressionGenerator {
                 break;
             }
         }
-        expression.append(text.substring(pos));
+        expression.append(escape(text.substring(pos)));
         return new GeneratedExpression(expression.toString(), argumentNames, transforms);
+    }
+
+    private String escape(String string) {
+        return string.replaceAll("([\\[\\](){}:])", "\\\\$1");
     }
 
     private List<TransformMatcher> createTransformMatchers(String text) {

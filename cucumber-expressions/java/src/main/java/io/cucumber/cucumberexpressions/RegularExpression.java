@@ -30,21 +30,7 @@ public class RegularExpression implements Expression {
         while (matcher.find()) {
             Type type = types.size() <= typeIndex ? null : types.get(typeIndex++);
             String captureGroupPattern = matcher.group(1);
-
-            Transform<?> transform = null;
-            if (type != null) {
-                transform = transformLookup.lookupByType(type);
-            }
-            if (transform == null) {
-                transform = transformLookup.lookupByCaptureGroupRegexp(captureGroupPattern);
-            }
-            if (transform == null && type != null && type instanceof Class) {
-                transform = new ClassTransform<>((Class) type);
-            }
-            if (transform == null) {
-                transform = new ConstructorTransform<>(String.class);
-            }
-            transforms.add(transform);
+            transforms.add(transformLookup.lookupTransform(type, captureGroupPattern));
         }
     }
 

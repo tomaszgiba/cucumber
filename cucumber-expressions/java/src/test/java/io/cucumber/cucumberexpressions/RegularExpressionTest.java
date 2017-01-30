@@ -31,12 +31,12 @@ public class RegularExpressionTest {
 
     @Test
     public void transforms_to_string_by_default() {
-        assertEquals(singletonList("22"), match(compile("(.*)"), "22", Collections.<Type>singletonList(String.class)));
+        assertEquals(singletonList("22"), match(compile("(.*)"), "22", Collections.singletonList(String.class)));
     }
 
     @Test
     public void transforms_integer_to_double_using_explicit_type() {
-        assertEquals(singletonList(22.0), match(compile("(.*)"), "22", Collections.<Type>singletonList(Double.class)));
+        assertEquals(singletonList(22.0), match(compile("(.*)"), "22", Collections.singletonList(Double.class)));
     }
 
     @Test
@@ -46,28 +46,28 @@ public class RegularExpressionTest {
 
     @Test
     public void transforms_double_without_integer_value() {
-        assertEquals(singletonList(0.22), match(compile("(.*)"), ".22", Collections.<Type>singletonList(Double.class)));
+        assertEquals(singletonList(0.22), match(compile("(.*)"), ".22", Collections.singletonList(Double.class)));
     }
 
     @Test
     public void transforms_double_with_comma_decimal_separator() {
-        assertEquals(singletonList(1.22), match(compile("(.*)"), "1,22", Collections.<Type>singletonList(Double.class), Locale.FRANCE));
+        assertEquals(singletonList(1.22), match(compile("(.*)"), "1,22", Collections.singletonList(Double.class), Locale.FRANCE));
     }
 
     @Test
     public void transforms_double_with_sign() {
-        assertEquals(singletonList(-1.22), match(compile("(.*)"), "-1.22", Collections.<Type>singletonList(Double.class)));
+        assertEquals(singletonList(-1.22), match(compile("(.*)"), "-1.22", Collections.singletonList(Double.class)));
     }
 
     @Test
     public void rounds_double_to_integer() {
-        assertEquals(singletonList(1), match(compile("(.*)"), "1.22", Collections.<Type>singletonList(Integer.class)));
+        assertEquals(singletonList(1), match(compile("(.*)"), "1.22", Collections.singletonList(Integer.class)));
     }
 
     @Test
     public void exposes_source() {
         String expr = "I have (\\d+) cukes? in my (.+) now";
-        assertEquals(expr, new RegularExpression(Pattern.compile(expr), Collections.<Type>emptyList(), new TransformLookup(Locale.ENGLISH)).getSource());
+        assertEquals(expr, new RegularExpression(Pattern.compile(expr), Collections.emptyList(), new TransformLookup(Locale.ENGLISH)).getSource());
     }
 
     private List<?> match(Pattern pattern, String text) {

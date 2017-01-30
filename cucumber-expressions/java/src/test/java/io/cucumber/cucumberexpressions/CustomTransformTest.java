@@ -74,14 +74,14 @@ public class CustomTransformTest {
 
     @Test
     public void transforms_CucumberExpression_arguments_using_argument_name_as_type() {
-        Expression expression = new CucumberExpression("I have a {color} ball", Collections.<Type>emptyList(), transformLookup);
+        Expression expression = new CucumberExpression("I have a {color} ball", Collections.emptyList(), transformLookup);
         Object transformedArgumentValue = expression.match("I have a red ball").get(0).getTransformedValue();
         assertEquals(new Color("red"), transformedArgumentValue);
     }
 
     @Test
     public void transforms_CucumberExpression_arguments_with_explicit_type_using_constructor_directly() {
-        Expression expression = new CucumberExpression("I have a {color} ball", Collections.<Type>singletonList(Color.class), new TransformLookup(Locale.ENGLISH));
+        Expression expression = new CucumberExpression("I have a {color} ball", Collections.<Type>singletonList(Color.class), transformLookup);
         Color transformedArgumentValue = (Color) expression.match("I have a red ball").get(0).getTransformedValue();
         assertEquals("red", transformedArgumentValue.name);
     }

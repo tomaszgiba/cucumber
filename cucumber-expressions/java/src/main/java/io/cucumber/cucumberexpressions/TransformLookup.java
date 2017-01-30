@@ -15,9 +15,9 @@ public class TransformLookup {
     private static final List<String> FIXNUM_REGEXPS = asList("-?\\d+", "\\d+");
     private static final List<String> FLOATING_POINT_REGEXPS = singletonList("-?\\d*[\\.,]\\d+");
 
-    private Map<Type, Transform<?>> transformsByType = new HashMap<>();
-    private Map<String, Transform<?>> transformsByTypeName = new HashMap<>();
-    private Map<String, Transform<?>> transformsByCaptureGroupRegexp = new HashMap<>();
+    private final Map<Type, Transform<?>> transformsByType = new HashMap<>();
+    private final Map<String, Transform<?>> transformsByTypeName = new HashMap<>();
+    private final Map<String, Transform<?>> transformsByCaptureGroupRegexp = new HashMap<>();
 
     public TransformLookup(Locale locale) {
         NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
@@ -106,11 +106,11 @@ public class TransformLookup {
         }
     }
 
-    public <T> Transform<T> lookupByType(Type type) {
+    private <T> Transform<T> lookupByType(Type type) {
         return (Transform<T>) transformsByType.get(type);
     }
 
-    public Transform<?> lookupByTypeName(String typeName, boolean ignoreUnknownTypeName) {
+    private Transform<?> lookupByTypeName(String typeName, boolean ignoreUnknownTypeName) {
         Transform<?> transform = transformsByTypeName.get(typeName);
         if (transform == null) {
             if (ignoreUnknownTypeName) {
@@ -122,11 +122,48 @@ public class TransformLookup {
         return transform;
     }
 
-    public Transform lookupByCaptureGroupRegexp(String captureGroupPattern) {
+    private Transform lookupByCaptureGroupRegexp(String captureGroupPattern) {
         return transformsByCaptureGroupRegexp.get(captureGroupPattern);
     }
 
-    public Collection<Transform<?>> getTransforms() {
+    Collection<Transform<?>> getTransforms() {
         return transformsByType.values();
+    }
+
+    public Transform<?> lookupTransform(Type type, String captureGroupPattern) {
+        Transform<?> transform = null;
+        if (type != null) {
+            transform = lookupByType(type);
+        }
+        if (transform == null) {
+            transform = lookupByCaptureGroupRegexp(captureGroupPattern);
+        }
+        if (transform == null && type != null && type instanceof Class) {
+            transform = new ClassTransform<>((Class) type);
+        }
+        if (transform == null) {
+            transform = new ConstructorTransform<>(String.class);
+        }
+        return transform;
+    }
+
+    public Transform<?> lookupTransform(Type type, String parameterName, String typeName) {
+        Transform<?> transform = null;
+        if (type != null) {
+            transform = lookupByType(type);
+        }
+        if (transform == null && typeName != null) {
+            transform = lookupByTypeName(typeName, false);
+        }
+        if (transform == null) {
+            transform = lookupByTypeName(parameterName, true);
+        }
+        if (transform == null && type != null && type instanceof Class) {
+            transform = new ClassTransform<>((Class) type);
+        }
+        if (transform == null) {
+            transform = new ConstructorTransform<>(String.class);
+        }
+        return transform;
     }
 }
