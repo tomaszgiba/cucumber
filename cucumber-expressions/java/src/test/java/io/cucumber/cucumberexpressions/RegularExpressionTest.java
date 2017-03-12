@@ -17,12 +17,12 @@ import static org.junit.Assert.assertEquals;
 public class RegularExpressionTest {
     @Test
     public void document_match_arguments() {
-        TransformLookup transformLookup = new TransformLookup(Locale.ENGLISH);
+        ParameterTypeRegistry parameterTypeRegistry = new ParameterTypeRegistry(Locale.ENGLISH);
 
         /// [capture-match-arguments]
         Pattern expr = Pattern.compile("I have (\\d+) cukes? in my (\\w+) now");
         List<? extends Class<?>> types = asList(Integer.class, String.class);
-        Expression expression = new RegularExpression(expr, types, transformLookup);
+        Expression expression = new RegularExpression(expr, types, parameterTypeRegistry);
         List<Argument> match = expression.match("I have 7 cukes in my belly now");
         assertEquals(7, match.get(0).getTransformedValue());
         assertEquals("belly", match.get(1).getTransformedValue());
@@ -40,8 +40,9 @@ public class RegularExpressionTest {
     }
 
     @Test
-    public void transforms_to_double_using_capture_group_pattern() {
-        assertEquals(singletonList(22L), match(compile("(\\d+)"), "22"));
+    public void transforms_to_long_using_capture_group_pattern() {
+        List<?> match = match(compile("(\\d+)"), "22");
+        assertEquals(singletonList(22L), match);
     }
 
     @Test
@@ -60,14 +61,9 @@ public class RegularExpressionTest {
     }
 
     @Test
-    public void rounds_double_to_integer() {
-        assertEquals(singletonList(1), match(compile("(.*)"), "1.22", Collections.<Type>singletonList(Integer.class)));
-    }
-
-    @Test
     public void exposes_source() {
         String expr = "I have (\\d+) cukes? in my (.+) now";
-        assertEquals(expr, new RegularExpression(Pattern.compile(expr), Collections.<Type>emptyList(), new TransformLookup(Locale.ENGLISH)).getSource());
+        assertEquals(expr, new RegularExpression(Pattern.compile(expr), Collections.<Type>emptyList(), new ParameterTypeRegistry(Locale.ENGLISH)).getSource());
     }
 
     private List<?> match(Pattern pattern, String text) {
@@ -79,9 +75,9 @@ public class RegularExpressionTest {
     }
 
     private List<?> match(Pattern pattern, String text, List<Type> types, Locale locale) {
-        TransformLookup transformLookup = new TransformLookup(locale);
+        ParameterTypeRegistry parameterTypeRegistry = new ParameterTypeRegistry(locale);
         RegularExpression regularExpression;
-        regularExpression = new RegularExpression(pattern, types, transformLookup);
+        regularExpression = new RegularExpression(pattern, types, parameterTypeRegistry);
         List<Argument> arguments = regularExpression.match(text);
         List<Object> transformedValues = new ArrayList<>();
         for (Argument argument : arguments) {

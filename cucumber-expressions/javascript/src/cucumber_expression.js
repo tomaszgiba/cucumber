@@ -1,48 +1,60 @@
-import matchArguments from './match_arguments'
+const matchPattern = require('./build_arguments')
 
 class CucumberExpression {
   /**
    * @param expression
    * @param types Array of type name (String) or types (function). Functions can be a regular function or a constructor
-   * @param transformLookup
+   * @param parameterTypeRegistry
    */
-  constructor(expression, types, transformLookup) {
-    const parameterPattern = /\{([^}:]+)(:([^}]+))?}/g
-    const optionalPattern = /\(([^\)]+)\)/g
+  constructor (expression, types, parameterTypeRegistry) {
+    const PARAMETER_REGEXP = /\{([^}:]+)(:([^}]+))?}/g
+    const OPTIONAL_REGEXP = /\(([^)]+)\)/g
+    const ALTERNATIVE_WORD_REGEXP = /(\w+)((\/\w+)+)/g
 
     this._expression = expression
-    this._transforms = []
+    this._parameterTypes = []
     let regexp = "^"
     let typeIndex = 0
     let match
     let matchOffset = 0
 
-    // Create non-capturing, optional capture groups from parenthesis
-    expression = expression.replace(optionalPattern, '(?:$1)?')
+    // Does not include (){} because they have special meaning
+    expression = expression.replace(/([\\\^\[$.|?*+])/g, "\\$1")
 
-    while ((match = parameterPattern.exec(expression)) !== null) {
+    // Create non-capturing, optional capture groups from parenthesis
+    expression = expression.replace(OPTIONAL_REGEXP, '(?:$1)?')
+
+    expression = expression.replace(ALTERNATIVE_WORD_REGEXP, (_, p1, p2) => `(?:${p1}${p2.replace(/\//g, '|')})`)
+
+    while ((match = PARAMETER_REGEXP.exec(expression)) !== null) {
       const parameterName = match[1]
-      const typeName = match[3]
+      const parameterTypeName = match[3]
+      // eslint-disable-next-line no-console
+      if (parameterTypeName && (typeof console !== 'undefined') && (typeof console.error == 'function')) {
+        // eslint-disable-next-line no-console
+        console.error(`Cucumber expression parameter syntax {${parameterName}:${parameterTypeName}} is deprecated. Please use {${parameterTypeName}} instead.`)
+      }
+
       const type = types.length <= typeIndex ? null : types[typeIndex++]
 
-      let transform;
+      let parameter
       if (type) {
-        transform = transformLookup.lookupByType(type)
+        parameter = parameterTypeRegistry.lookupByType(type)
       }
-      if (!transform && typeName) {
-        transform = transformLookup.lookupByTypeName(typeName, false)
+      if (!parameter && parameterTypeName) {
+        parameter = parameterTypeRegistry.lookupByTypeName(parameterTypeName)
       }
-      if (!transform) {
-        transform = transformLookup.lookupByTypeName(parameterName, true)
+      if (!parameter) {
+        parameter = parameterTypeRegistry.lookupByTypeName(parameterName)
       }
-      if (!transform) {
-        transform = transformLookup.createAnonymousLookup(s => s)
+      if (!parameter) {
+        parameter = parameterTypeRegistry.createAnonymousLookup(s => s)
       }
-      this._transforms.push(transform)
+      this._parameterTypes.push(parameter)
 
       const text = expression.slice(matchOffset, match.index)
-      const captureRegexp = `(${transform.captureGroupRegexps[0]})`
-      matchOffset = parameterPattern.lastIndex
+      const captureRegexp = getCaptureRegexp(parameter.regexps)
+      matchOffset = PARAMETER_REGEXP.lastIndex
       regexp += text
       regexp += captureRegexp
     }
@@ -51,13 +63,25 @@ class CucumberExpression {
     this._regexp = new RegExp(regexp)
   }
 
-  match(text) {
-    return matchArguments(this._regexp, text, this._transforms)
+  match (text) {
+    return matchPattern(this._regexp, text, this._parameterTypes)
   }
 
-  get source() {
+  get source () {
     return this._expression
   }
 }
 
-export default CucumberExpression
+function getCaptureRegexp (regexps) {
+  if (regexps.length === 1) {
+    return `(${regexps[0]})`
+  }
+
+  const captureGroups = regexps.map(group => {
+    return `(?:${group})`
+  })
+
+  return `(${captureGroups.join('|')})`
+}
+
+module.exports = CucumberExpression

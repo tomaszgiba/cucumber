@@ -1,51 +1,62 @@
-require 'cucumber/cucumber_expressions/argument_matcher'
-require 'cucumber/cucumber_expressions/transform'
+require 'cucumber/cucumber_expressions/argument_builder'
+require 'cucumber/cucumber_expressions/parameter_type'
 
 module Cucumber
   module CucumberExpressions
     class CucumberExpression
-      PARAMETER_PATTERN = /\{([^}:]+)(:([^}]+))?}/
-      OPTIONAL_PATTERN = /\(([^\)]+)\)/
+      PARAMETER_REGEXP = /\{([^}:]+)(:([^}]+))?}/
+      OPTIONAL_REGEXP = /\(([^)]+)\)/
+      ALTERNATIVE_WORD_REGEXP = /([[:alpha:]]+)((\/[[:alpha:]]+)+)/
 
       attr_reader :source
 
-      def initialize(expression, types, transform_lookup)
+      def initialize(expression, types, parameter_type_registry)
         @source = expression
-        @transforms = []
+        @parameter_types = []
         regexp = "^"
         type_index = 0
-        match = nil
         match_offset = 0
 
+        # Escape Does not include (){} because they have special meaning
+        expression = expression.gsub(/([\\\^\[$.|?*+\]])/, '\\\\\1')
+
         # Create non-capturing, optional capture groups from parenthesis
-        expression = expression.gsub(OPTIONAL_PATTERN, '(?:\1)?')
+        expression = expression.gsub(OPTIONAL_REGEXP, '(?:\1)?')
+
+        expression = expression.gsub(ALTERNATIVE_WORD_REGEXP) do |_|
+          "(?:#{$1}#{$2.tr('/', '|')})"
+        end
 
         loop do
-          match = PARAMETER_PATTERN.match(expression, match_offset)
+          match = PARAMETER_REGEXP.match(expression, match_offset)
           break if match.nil?
 
           parameter_name = match[1]
-          type_name = match[3]
+          parameter_type_name = match[3]
+          if parameter_type_name
+            $stderr.puts("Cucumber expression parameter syntax {#{parameter_name}:#{parameter_type_name}} is deprecated. Please use {#{parameter_type_name}} instead.")
+          end
+
           type = types.length <= type_index ? nil : types[type_index]
           type_index += 1
 
-          transform = nil
-          if (type)
-            transform = transform_lookup.lookup_by_type(type)
+          parameter_type = nil
+          if type
+            parameter_type = parameter_type_registry.lookup_by_type(type)
           end
-          if (transform.nil? && type_name)
-            transform = transform_lookup.lookup_by_type_name(type_name, false)
+          if parameter_type.nil? && parameter_type_name
+            parameter_type = parameter_type_registry.lookup_by_name(parameter_type_name)
           end
-          if (transform.nil?)
-            transform = transform_lookup.lookup_by_type_name(parameter_name, true)
+          if parameter_type.nil?
+            parameter_type = parameter_type_registry.lookup_by_name(parameter_name)
           end
-          if (transform.nil?)
-            transform = transform_lookup.create_anonymous_lookup(lambda {|s| s})
+          if parameter_type.nil?
+            parameter_type = parameter_type_registry.create_anonymous_lookup(lambda {|s| s})
           end
-          @transforms.push(transform)
+          @parameter_types.push(parameter_type)
 
           text = expression.slice(match_offset...match.offset(0)[0])
-          capture_regexp = "(#{transform.capture_group_regexps[0]})"
+          capture_regexp = regexp(parameter_type.regexps)
           match_offset = match.offset(0)[1]
           regexp += text
           regexp += capture_regexp
@@ -56,7 +67,15 @@ module Cucumber
       end
 
       def match(text)
-        ArgumentMatcher.match_arguments(@regexp, text, @transforms)
+        ArgumentBuilder.build_arguments(@regexp, text, @parameter_types)
+      end
+
+      private
+
+      def regexp(regexps)
+        return "(#{regexps[0]})" if regexps.size == 1
+        capture_groups = regexps.map { |group| "(?:#{group})" }
+        "(#{capture_groups.join('|')})"
       end
     end
   end

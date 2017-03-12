@@ -7,45 +7,60 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CucumberExpression implements Expression {
-    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{([^\\}:]+)(:([^\\}]+))?\\}");
-    private static final Pattern OPTIONAL_PATTERN = Pattern.compile("\\(([^\\)]+)\\)");
+    private static final Pattern ESCAPE_PATTERN = Pattern.compile("([\\\\\\^\\[$.|?*+\\]])");
+    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{([^}:]+)(:([^}]+))?}");
+    private static final Pattern OPTIONAL_PATTERN = Pattern.compile("\\(([^)]+)\\)");
+    private static final Pattern ALTERNATIVE_WORD_REGEXP = Pattern.compile("([\\p{IsAlphabetic}]+)((/[\\p{IsAlphabetic}]+)+)");
 
     private final Pattern pattern;
-    private final List<Transform<?>> transforms = new ArrayList<>();
+    private final List<ParameterType<?>> parameterTypes = new ArrayList<>();
     private final String expression;
 
-    public CucumberExpression(final String expression, List<? extends Type> types, TransformLookup transformLookup) {
+    public CucumberExpression(String expression, List<? extends Type> types, ParameterTypeRegistry parameterTypeRegistry) {
         this.expression = expression;
-        String expressionWithOptionalGroups = OPTIONAL_PATTERN.matcher(expression).replaceAll("(?:$1)?");
-        Matcher matcher = PARAMETER_PATTERN.matcher(expressionWithOptionalGroups);
+        expression = ESCAPE_PATTERN.matcher(expression).replaceAll("\\\\$1");
+        expression = OPTIONAL_PATTERN.matcher(expression).replaceAll("(?:$1)?");
+
+        Matcher m = ALTERNATIVE_WORD_REGEXP.matcher(expression);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            m.appendReplacement(sb, "(?:" + m.group(1) + m.group(2).replace('/', '|') + ")");
+        }
+        m.appendTail(sb);
+
+        Matcher matcher = PARAMETER_PATTERN.matcher(sb.toString());
 
         StringBuffer regexp = new StringBuffer();
         regexp.append("^");
         int typeIndex = 0;
         while (matcher.find()) {
-            Type type = types.size() <= typeIndex ? null : types.get(typeIndex++);
             String parameterName = matcher.group(1);
-            String typeName = matcher.group(3);
+            String parameterTypeName = matcher.group(3);
+            if (parameterTypeName != null) {
+                System.err.println(String.format("Cucumber expression parameter type syntax {%s:%s} is deprecated. Please use {%s} instead.", parameterName, parameterTypeName, parameterTypeName));
+            }
 
-            Transform<?> transform = null;
+            Type type = types.size() <= typeIndex ? null : types.get(typeIndex++);
+
+            ParameterType<?> parameterType = null;
             if (type != null) {
-                transform = transformLookup.lookupByType(type);
+                parameterType = parameterTypeRegistry.lookupByType(type);
             }
-            if (transform == null && typeName != null) {
-                transform = transformLookup.lookupByTypeName(typeName, false);
+            if (parameterType == null && parameterTypeName != null) {
+                parameterType = parameterTypeRegistry.lookupByTypeName(parameterTypeName);
             }
-            if (transform == null) {
-                transform = transformLookup.lookupByTypeName(parameterName, true);
+            if (parameterType == null) {
+                parameterType = parameterTypeRegistry.lookupByTypeName(parameterName);
             }
-            if (transform == null && type != null && type instanceof Class) {
-                transform = new ClassTransform<>((Class) type);
+            if (parameterType == null && type != null && type instanceof Class) {
+                parameterType = new ClassParameterType<>((Class) type);
             }
-            if (transform == null) {
-                transform = new ConstructorTransform<>(String.class);
+            if (parameterType == null) {
+                parameterType = new ConstructorParameterType<>(String.class);
             }
-            transforms.add(transform);
+            parameterTypes.add(parameterType);
 
-            matcher.appendReplacement(regexp, Matcher.quoteReplacement("(" + transform.getCaptureGroupRegexps().get(0) + ")"));
+            matcher.appendReplacement(regexp, Matcher.quoteReplacement(getCaptureGroupRegexp(parameterType.getRegexps())));
         }
         matcher.appendTail(regexp);
         regexp.append("$");
@@ -53,9 +68,27 @@ public class CucumberExpression implements Expression {
         pattern = Pattern.compile(regexp.toString());
     }
 
+    private String getCaptureGroupRegexp(List<String> regexps) {
+        StringBuilder sb = new StringBuilder("(");
+
+        if (regexps.size() == 1) {
+            sb.append(regexps.get(0));
+        } else {
+            boolean bar = false;
+            for (String captureGroupRegexp : regexps) {
+                if (bar) sb.append("|");
+                sb.append("(?:").append(captureGroupRegexp).append(")");
+                bar = true;
+            }
+        }
+
+        sb.append(")");
+        return sb.toString();
+    }
+
     @Override
     public List<Argument> match(String text) {
-        return ArgumentMatcher.matchArguments(pattern, text, transforms);
+        return ArgumentBuilder.buildArguments(pattern, text, parameterTypes);
     }
 
     @Override

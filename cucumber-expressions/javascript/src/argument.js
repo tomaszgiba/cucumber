@@ -1,8 +1,8 @@
 class Argument {
-  constructor(offset, value, transformedValue) {
+  constructor(offset, value, parameterType) {
     this._offset = offset
     this._value = value
-    this._transformedValue = transformedValue
+    this._parameterType = parameterType
   }
 
   get offset() {
@@ -14,8 +14,8 @@ class Argument {
   }
 
   get transformedValue() {
-    return this._transformedValue
+    return this._parameterType.transform(this._value)
   }
 }
 
-export default Argument
+module.exports = Argument

@@ -1,5 +1,6 @@
-LICENSE: ../../LICENSE
-	cp $< $@
+.PHONY: build
+build:
+	mvn test
 
 .PHONY: release
 release:

@@ -50,17 +50,17 @@ public class ExpressionExamplesTest {
     @Test
     public void works_with_expression() {
         String args = new Gson().toJson(match(expressionString, text));
-        assertEquals(expectedArgs, args);
+        assertEquals(String.format("\nExpression: %s\n      Text: %s", expressionString, text), expectedArgs, args);
     }
 
     private List<Object> match(String expressionString, String text) {
         Expression expression;
         Matcher matcher = REGEX_PATTERN.matcher(expressionString);
-        TransformLookup transformLookup = new TransformLookup(Locale.ENGLISH);
+        ParameterTypeRegistry parameterTypeRegistry = new ParameterTypeRegistry(Locale.ENGLISH);
         if (matcher.matches()) {
-            expression = new RegularExpression(Pattern.compile(matcher.group(1)), Collections.<Type>emptyList(), transformLookup);
+            expression = new RegularExpression(Pattern.compile(matcher.group(1)), Collections.<Type>emptyList(), parameterTypeRegistry);
         } else {
-            expression = new CucumberExpression(expressionString, Collections.<Type>emptyList(), transformLookup);
+            expression = new CucumberExpression(expressionString, Collections.<Type>emptyList(), parameterTypeRegistry);
         }
         List<Argument> arguments = expression.match(text);
         if (arguments == null) return null;

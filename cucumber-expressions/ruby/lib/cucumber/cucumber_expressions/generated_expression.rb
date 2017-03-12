@@ -1,10 +1,10 @@
 module Cucumber
   module CucumberExpressions
     class GeneratedExpression
-      attr_reader :source, :argumentNames, :transforms
+      attr_reader :source, :parameter_names, :parameter_types
 
-      def initialize(source, argumentNames, transforms)
-        @source, @argumentNames, @transforms = source, argumentNames, transforms
+      def initialize(source, parameter_names, parameters_types)
+        @source, @parameter_names, @parameter_types = source, parameter_names, parameters_types
       end
     end
   end

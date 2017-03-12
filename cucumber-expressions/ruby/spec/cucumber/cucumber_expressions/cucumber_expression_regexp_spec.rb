@@ -1,12 +1,12 @@
 require 'cucumber/cucumber_expressions/cucumber_expression'
-require 'cucumber/cucumber_expressions/transform_lookup'
+require 'cucumber/cucumber_expressions/parameter_type_registry'
 
 module Cucumber
   module CucumberExpressions
     describe CucumberExpression do
       context "Regexp translation" do
         def assert_regexp(expression, regexp)
-          cucumber_expression = CucumberExpression.new(expression, [], TransformLookup.new)
+          cucumber_expression = CucumberExpression.new(expression, [], ParameterTypeRegistry.new)
           expect(regexp).to eq(cucumber_expression.instance_variable_get('@regexp'))
         end
 
@@ -14,6 +14,13 @@ module Cucumber
           assert_regexp(
             "I have 10 cukes in my belly now",
             /^I have 10 cukes in my belly now$/
+          )
+        end
+
+        it "translates alternation" do
+          assert_regexp(
+            "I had/have a great/nice/charming friend",
+            /^I (?:had|have) a (?:great|nice|charming) friend$/
           )
         end
 
@@ -26,8 +33,8 @@ module Cucumber
 
         it "translates three typed arguments" do
           assert_regexp(
-            "I have {n:float} cukes in my {bodypart} at {time:int} o'clock",
-            /^I have (-?\d*\.?\d+) cukes in my (.+) at (-?\d+) o'clock$/
+            "I have {float} cukes in my {bodypart} at {int} o'clock",
+            /^I have (-?\d*\.?\d+) cukes in my (.+) at ((?:-?\d+)|(?:\d+)) o'clock$/
           )
         end
 

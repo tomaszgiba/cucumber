@@ -33,10 +33,7 @@ Examples of consumers are:
 
 ### start {#event-start}
 
-A `start` event marks the start of a stream of events. This allows multiple logical
-event streams to be sent over the same transport without collision. The `series`
-property specified in the `start` event must be repeated by other events in the same
-logical stream.
+A `start` event marks the start of a stream of events. 
 
 Example:
 
@@ -57,6 +54,16 @@ Example:
 [snippet](examples/events/002_source.json)
 ```
 
+### pickle
+
+A `pickle' event contains details of a compiled test case.
+
+Example:
+
+```json
+[snippet](examples/events/003_pickle.json)
+```
+
 ### attachment {#event-attachment}
 
 An `attachment` attaches a piece of metadata to a particular line in a `source` file.
@@ -68,13 +75,13 @@ Attachments can have many types (specified by a media type), and are typically u
 Example (PNG image):
 
 ```json
-[snippet](examples/events/003_attachment-png-embedded.json)
+[snippet](examples/events/004_attachment-png-embedded.json)
 ```
 
 Example (Java stack trace):
 
 ```json
-[snippet](examples/events/004_attachment-stacktrace.json)
+[snippet](examples/events/005_attachment-stacktrace.json)
 ```
 
 ### Cucumber-specific attachments
@@ -179,6 +186,6 @@ typically in a git repository and/or pull request for a consumer.
 To modify the protocol, start by adding or modifying an example event in `examples/events/`.
 When you run `make` this should cause a validation error.
 
-Next, add or modify a schema in `schema/` and ensure `make` runs without validation errors.
+Next, add or modify a schema in `schema/` and ensure `make` runs without validation errors. You can learn about JSON schemas in [this short book](https://spacetelescope.github.io/understanding-json-schema/UnderstandingJSONSchema.pdf).
 
 Also see the general [contributing guidelines](../CONTRIBUTING.md).

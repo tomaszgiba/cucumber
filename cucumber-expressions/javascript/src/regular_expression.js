@@ -1,9 +1,9 @@
-import matchArguments from './match_arguments'
+const buildArguments = require('./build_arguments')
 
 class RegularExpression {
-  constructor(regexp, types, transformLookup) {
+  constructor(regexp, types, parameterTypeRegistry) {
     this._regexp = regexp
-    this._transforms = []
+    this._parameterTypes = []
 
     const CAPTURE_GROUP_PATTERN = /\(([^(]+)\)/g
 
@@ -13,22 +13,22 @@ class RegularExpression {
       const captureGroupPattern = match[1]
       const type = types.length <= typeIndex ? null : types[typeIndex++]
 
-      let transform;
+      let parameterType
       if (type) {
-        transform = transformLookup.lookupByType(type)
+        parameterType = parameterTypeRegistry.lookupByType(type)
       }
-      if (!transform) {
-        transform = transformLookup.lookupByCaptureGroupRegexp(captureGroupPattern)
+      if (!parameterType) {
+        parameterType = parameterTypeRegistry.lookupByRegexp(captureGroupPattern)
       }
-      if (!transform) {
-        transform = transformLookup.createAnonymousLookup(s => s)
+      if (!parameterType) {
+        parameterType = parameterTypeRegistry.createAnonymousLookup(s => s)
       }
-      this._transforms.push(transform)
+      this._parameterTypes.push(parameterType)
     }
   }
 
   match(text) {
-    return matchArguments(this._regexp, text, this._transforms)
+    return buildArguments(this._regexp, text, this._parameterTypes)
   }
 
   getSource() {
@@ -36,4 +36,4 @@ class RegularExpression {
   }
 }
 
-export default RegularExpression
+module.exports = RegularExpression

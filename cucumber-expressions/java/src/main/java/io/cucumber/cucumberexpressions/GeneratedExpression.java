@@ -4,24 +4,24 @@ import java.util.List;
 
 public class GeneratedExpression {
     private final String expression;
-    private final List<String> argumentNames;
-    private final List<Transform<?>> transforms;
+    private final List<String> parameterNames;
+    private final List<ParameterType<?>> parameterTypes;
 
-    public GeneratedExpression(String expression, List<String> argumentNames, List<Transform<?>> transforms) {
+    public GeneratedExpression(String expression, List<String> parameterNames, List<ParameterType<?>> parameterTypes) {
         this.expression = expression;
-        this.argumentNames = argumentNames;
-        this.transforms = transforms;
+        this.parameterNames = parameterNames;
+        this.parameterTypes = parameterTypes;
     }
 
     public String getSource() {
         return expression;
     }
 
-    public List<String> getArgumentNames() {
-        return argumentNames;
+    public List<String> getParameterNames() {
+        return parameterNames;
     }
 
-    public List<Transform<?>> getTransforms() {
-        return transforms;
+    public List<ParameterType<?>> getParameterTypes() {
+        return parameterTypes;
     }
 }
