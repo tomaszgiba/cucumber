@@ -1,0 +1,8 @@
+(1:1)FeatureLine:Feature/F/
+(2:3)RuleLine:Rule/R1/
+(3:5)ScenarioLine:Example/E1/
+(4:7)StepLine:Given /whatevs/
+(5:1)Empty://
+(6:5)ScenarioLine:Example/E2/
+(7:7)StepLine:Given /whatevs/
+EOF

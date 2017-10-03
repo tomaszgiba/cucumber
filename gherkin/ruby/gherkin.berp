@@ -1,5 +1,5 @@
 ﻿[
-	Tokens -> #Empty,#Comment,#TagLine,#FeatureLine,#BackgroundLine,#ScenarioLine,#ScenarioOutlineLine,#ExamplesLine,#StepLine,#DocStringSeparator,#TableRow,#Language
+	Tokens -> #Empty,#Comment,#TagLine,#FeatureLine,#BackgroundLine,#RuleLine,#ScenarioLine,#ScenarioOutlineLine,#ExamplesLine,#StepLine,#DocStringSeparator,#TableRow,#Language
 	IgnoredTokens -> #Comment,#Empty
 	ClassName -> Parser
 	Namespace -> Gherkin
@@ -12,7 +12,9 @@ Feature_Header! := #Language? Tags? #FeatureLine Feature_Description
 Background! := #BackgroundLine Background_Description Scenario_Step*
 
 // we could avoid defining Scenario_Definition, but that would require regular look-aheads, so worse performance
-Scenario_Definition! := Tags? (Scenario | ScenarioOutline)
+Scenario_Definition! := Tags? Rule? (Scenario | ScenarioOutline)
+
+Rule! := #RuleLine
 
 Scenario! := #ScenarioLine Scenario_Description Scenario_Step*
 

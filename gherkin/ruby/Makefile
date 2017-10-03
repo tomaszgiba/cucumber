@@ -52,7 +52,7 @@ clean:
 	rm -rf .compared .built acceptance lib/gherkin/parser.rb coverage
 .PHONY: clean
 
-lib/gherkin/parser.rb: gherkin.berp gherkin-ruby.razor berp/berp.exe
+lib/gherkin/parser.rb: gherkin.berp gherkin-ruby.razor lib/gherkin/gherkin-languages.json berp/berp.exe
 	mono berp/berp.exe -g gherkin.berp -t gherkin-ruby.razor -o $@
 	# Remove BOM
 	tail -c +4 $@ > $@.nobom

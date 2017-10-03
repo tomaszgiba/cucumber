@@ -651,8 +651,12 @@
     ],
     "name": "English",
     "native": "English",
+    "rule": [
+      "Rule"
+    ],
     "scenario": [
-      "Scenario"
+      "Scenario",
+      "Example"
     ],
     "scenarioOutline": [
       "Scenario Outline",
