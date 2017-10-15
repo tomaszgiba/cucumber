@@ -1,5 +1,6 @@
 package io.cucumber.cucumberexpressions;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -18,6 +19,7 @@ public class ParameterTypeRegistry {
 
     private final Map<String, ParameterType<?>> parameterTypeByName = new HashMap<>();
     private final Map<String, SortedSet<ParameterType<?>>> parameterTypesByRegexp = new HashMap<>();
+    private final Map<Type, ParameterType<?>> parameterTypeByType = new HashMap<>();
 
     public ParameterTypeRegistry(Locale locale) {
         NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
@@ -89,6 +91,7 @@ public class ParameterTypeRegistry {
         if (parameterTypeByName.containsKey(parameterType.getName()))
             throw new DuplicateTypeNameException(String.format("There is already a parameter type with name %s", parameterType.getName()));
         parameterTypeByName.put(parameterType.getName(), parameterType);
+        parameterTypeByType.put(parameterType.getType(), parameterType);
 
         for (String parameterTypeRegexp : parameterType.getRegexps()) {
             if(parameterTypesByRegexp.get(parameterTypeRegexp) == null){
@@ -108,6 +111,10 @@ public class ParameterTypeRegistry {
 
     public <T> ParameterType<T> lookupByTypeName(String typeName) {
         return (ParameterType<T>) parameterTypeByName.get(typeName);
+    }
+
+    public <T> ParameterType<T> lookupByType(Type type) {
+        return (ParameterType<T>) parameterTypeByType.get(type);
     }
 
     public <T> ParameterType<T> lookupByRegexp(String parameterTypeRegexp, Pattern expressionRegexp, String text) {
