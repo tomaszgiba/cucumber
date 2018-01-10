@@ -19,7 +19,7 @@ When the acceptance tests are written as examples, they stimulate people’s ima
 
 When the team write their acceptance tests collaboratively, they can develop their own ubiquitous language for talking about their problem domain. This helps them avoid misunderstandings.
     
-##How Cucumber works with BDD?
+## How Cucumber works with BDD?
 
 This is the most typical question for every enthusiastic personality would get.
 What makes Cucumber to stand out from the crowd of other communication and collaboration tools ?
@@ -29,7 +29,7 @@ Cucumber has designed specifically to ensure the acceptance tests can easily be 
 Cucumber was designed specifically to help business stakeholders get involved in writing acceptance tests.
 
 Each test case in Cucumber is called a scenario, and scenarios are grouped into features. Each scenario contains several steps.
-The business-facing parts of a Cucumber test suite, stored in feature files, must be written according to syntax rules—known as Gherkin—so that Cucumber can read them.
+The business-facing parts of a Cucumber test suite, stored in feature files, must be written according to syntax rules — known as [Gherkin](docs/gherkin.md) — so that Cucumber can read them.
 Under the hood, step definitions translate from the business-facing language of steps into programming code.
 
  ![Cucumber-stack](docs/images/Cucumber_Stack.png)
